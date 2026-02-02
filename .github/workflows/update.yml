@@ -26,6 +26,12 @@ jobs:
         pip install -r requirements.txt
 
     - name: Generate Feed
+      env:
+        EMAIL_USER: ${{ secrets.EMAIL_USER }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+        EMAIL_TO: ${{ secrets.EMAIL_TO }}
+        SMTP_SERVER: ${{ secrets.SMTP_SERVER }} # Optional, defaults to smtp.qq.com in script
+        SMTP_PORT: ${{ secrets.SMTP_PORT }}     # Optional, defaults to 465 in script
       run: python main.py
 
     - name: Commit and Push
