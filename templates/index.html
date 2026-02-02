@@ -19,6 +19,25 @@
             color: var(--text-main);
             margin: 0;
             padding: 20px;
+            /* Add padding to top to avoid translation bar overlap if any */
+            padding-top: 0; 
+        }
+        /* Google Translate Widget Styling */
+        #google_translate_element {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        /* Mobile adjustment for translate widget */
+        @media (max-width: 600px) {
+            #google_translate_element {
+                position: relative;
+                top: 0;
+                right: 0;
+                text-align: center;
+                margin-bottom: 20px;
+            }
         }
         .container {
             max-width: 800px;
