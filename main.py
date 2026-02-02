@@ -31,6 +31,42 @@ def format_date(date_struct):
     dt = datetime.fromtimestamp(time.mktime(date_struct))
     return dt.strftime('%Y-%m-%d %H:%M')
 
+def send_email(html_content, subject):
+    print("Preparing to send email...")
+    email_user = os.environ.get('EMAIL_USER')
+    email_pass = os.environ.get('EMAIL_PASS')
+    email_to = os.environ.get('EMAIL_TO')
+    smtp_server = os.environ.get('SMTP_SERVER', 'smtp.qq.com')
+    smtp_port = int(os.environ.get('SMTP_PORT', 465))
+
+    # Debug logging (masking password)
+    print(f"DEBUG: EMAIL_USER={'Found' if email_user else 'Missing'}")
+    print(f"DEBUG: EMAIL_PASS={'Found' if email_pass else 'Missing'}")
+    print(f"DEBUG: EMAIL_TO={'Found' if email_to else 'Missing'}")
+    
+    if not email_user or not email_pass or not email_to:
+        print("Email configuration missing (EMAIL_USER, EMAIL_PASS, EMAIL_TO). Skipping email.")
+        return
+
+    msg = MIMEMultipart()
+    msg['From'] = email_user
+    msg['To'] = email_to
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(html_content, 'html'))
+
+    try:
+        print(f"Connecting to SMTP server: {smtp_server}:{smtp_port}...")
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context) as server:
+            print("Logging in to SMTP server...")
+            server.login(email_user, email_pass)
+            print("Sending email...")
+            server.sendmail(email_user, email_to, msg.as_string())
+        print(f"Email sent successfully to {email_to}!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
 def main():
     # 1. Load Config
     config = load_config()
