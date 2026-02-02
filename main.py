@@ -102,5 +102,8 @@ def main():
     
     print(f"Successfully generated {output_file}")
 
+    # 6. Send Email
+    send_email(html_content, f"每日信息汇总 - {now.strftime('%Y-%m-%d')}")
+
 if __name__ == "__main__":
     main()
