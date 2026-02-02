@@ -53,45 +53,45 @@ def send_email(html_content, subject):
 
     msg.attach(MIMEText(html_content, 'html'))
 
-            # Try Port 465 (SSL) - Simplified for QQ
-            try:
-                smtp_server = 'smtp.qq.com'
-                smtp_port = 465
-                print(f"Connecting to SMTP server: {smtp_server}:{smtp_port} (SSL)...")
-                
-                # Use unverified context to avoid SSL cert issues
-                context = ssl.create_default_context()
-                context.check_hostname = False
-                context.verify_mode = ssl.CERT_NONE
-                
-                with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context, timeout=30) as server:
-                    print("Connected. Logging in...")
-                    server.login(email_user, email_pass)
-                    print("Logged in. Sending email...")
-                    server.sendmail(email_user, email_to, msg.as_string())
-                print(f"Email sent successfully to {email_to} via Port 465!")
-                return
-            except Exception as e:
-                print(f"Failed to send email via Port 465: {e}")
-                print("Retrying with Port 587 (STARTTLS)...")
+    # Try Port 465 (SSL) - Simplified for QQ
+    try:
+        smtp_server = 'smtp.qq.com'
+        smtp_port = 465
+        print(f"Connecting to SMTP server: {smtp_server}:{smtp_port} (SSL)...")
+        
+        # Use unverified context to avoid SSL cert issues
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+        
+        with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context, timeout=30) as server:
+            print("Connected. Logging in...")
+            server.login(email_user, email_pass)
+            print("Logged in. Sending email...")
+            server.sendmail(email_user, email_to, msg.as_string())
+        print(f"Email sent successfully to {email_to} via Port 465!")
+        return
+    except Exception as e:
+        print(f"Failed to send email via Port 465: {e}")
+        print("Retrying with Port 587 (STARTTLS)...")
 
-            # Retry Port 587 (STARTTLS)
-            try:
-                smtp_port = 587
-                print(f"Connecting to SMTP server: {smtp_server}:{smtp_port} (STARTTLS)...")
-                # Use standard smtplib.SMTP for STARTTLS
-                with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
-                    print("Connected. Starting TLS...")
-                    server.ehlo()
-                    server.starttls()
-                    server.ehlo()
-                    print("Logging in to SMTP server...")
-                    server.login(email_user, email_pass)
-                    print("Sending email...")
-                    server.sendmail(email_user, email_to, msg.as_string())
-                print(f"Email sent successfully to {email_to} via Port 587!")
-            except Exception as e:
-                print(f"Failed to send email via Port 587: {e}")
+    # Retry Port 587 (STARTTLS)
+    try:
+        smtp_port = 587
+        print(f"Connecting to SMTP server: {smtp_server}:{smtp_port} (STARTTLS)...")
+        # Use standard smtplib.SMTP for STARTTLS
+        with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
+            print("Connected. Starting TLS...")
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            print("Logging in to SMTP server...")
+            server.login(email_user, email_pass)
+            print("Sending email...")
+            server.sendmail(email_user, email_to, msg.as_string())
+        print(f"Email sent successfully to {email_to} via Port 587!")
+    except Exception as e:
+        print(f"Failed to send email via Port 587: {e}")
 
 def main():
     # 1. Load Config
