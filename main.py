@@ -37,7 +37,12 @@ def send_email(html_content, subject):
     email_pass = os.environ.get('EMAIL_PASS')
     email_to = os.environ.get('EMAIL_TO')
     smtp_server = os.environ.get('SMTP_SERVER', 'smtp.qq.com')
-    smtp_port = int(os.environ.get('SMTP_PORT', 465))
+    smtp_port_str = os.environ.get('SMTP_PORT', '465')
+    try:
+        smtp_port = int(smtp_port_str) if smtp_port_str else 465
+    except ValueError:
+        print(f"Warning: Invalid SMTP_PORT '{smtp_port_str}', defaulting to 465")
+        smtp_port = 465
 
     # Debug logging (masking password)
     print(f"DEBUG: EMAIL_USER={'Found' if email_user else 'Missing'}")
