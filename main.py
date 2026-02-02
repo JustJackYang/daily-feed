@@ -1,6 +1,10 @@
 import feedparser
 import json
 import os
+import smtplib
+import ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 import time
