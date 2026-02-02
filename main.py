@@ -33,14 +33,10 @@ def format_date(date_struct):
 
 def send_email(html_content, subject):
     print("Preparing to send email...")
-    email_user = os.environ.get('EMAIL_USER')
-    email_pass = os.environ.get('EMAIL_PASS')
-    email_to = os.environ.get('EMAIL_TO')
+    email_user = os.environ.get('EMAIL_USER', '').strip()
+    email_pass = os.environ.get('EMAIL_PASS', '').strip()
+    email_to = os.environ.get('EMAIL_TO', '').strip()
     
-    # Hardcoded SMTP settings for QQ Mail to avoid env var issues
-    smtp_server = 'smtp.qq.com'
-    smtp_port = 465
-
     # Debug logging (masking password)
     print(f"DEBUG: EMAIL_USER={'Found' if email_user else 'Missing'}")
     print(f"DEBUG: EMAIL_PASS={'Found' if email_pass else 'Missing'}")
@@ -57,17 +53,36 @@ def send_email(html_content, subject):
 
     msg.attach(MIMEText(html_content, 'html'))
 
+    # Try Port 465 (SSL) first
     try:
-        print(f"Connecting to SMTP server: {smtp_server}:{smtp_port}...")
+        smtp_server = 'smtp.qq.com'
+        smtp_port = 465
+        print(f"Connecting to SMTP server: {smtp_server}:{smtp_port} (SSL)...")
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context) as server:
             print("Logging in to SMTP server...")
             server.login(email_user, email_pass)
             print("Sending email...")
             server.sendmail(email_user, email_to, msg.as_string())
-        print(f"Email sent successfully to {email_to}!")
+        print(f"Email sent successfully to {email_to} via Port 465!")
+        return
     except Exception as e:
-        print(f"Failed to send email: {e}")
+        print(f"Failed to send email via Port 465: {e}")
+        print("Retrying with Port 587 (STARTTLS)...")
+
+    # Retry Port 587 (STARTTLS)
+    try:
+        smtp_port = 587
+        print(f"Connecting to SMTP server: {smtp_server}:{smtp_port} (STARTTLS)...")
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            print("Logging in to SMTP server...")
+            server.login(email_user, email_pass)
+            print("Sending email...")
+            server.sendmail(email_user, email_to, msg.as_string())
+        print(f"Email sent successfully to {email_to} via Port 587!")
+    except Exception as e:
+        print(f"Failed to send email via Port 587: {e}")
 
 def main():
     # 1. Load Config
